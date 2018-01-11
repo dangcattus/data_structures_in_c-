@@ -51,7 +51,13 @@ public:
   Node* search (int val, Node* subtree);
 
   int remove(int i);
-  int removeAtIndex(int index);
+
+  void inorder(Node * node);
+  void postorder(Node * node);
+  void preorder(Node * node);
+
+  void printTree();
+  void printTree(int order);
 
   bool isEmpty();
   int getSize();
@@ -145,6 +151,70 @@ BinarySearchTree::Node* BinarySearchTree::search(int val, Node* subtree) {
   }
 }
 
+int BinarySearchTree::remove(int val) {
+  //return the node
+  return 0;
+// 1. node to be deleted is leaf
+// 2. node to be deleted has 1 child
+// 3. node to be deleted has 2 children
+}
+
+void BinarySearchTree::printTree() {
+
+    cout << "Print PreOrder Traversal: " << endl;
+    this->preorder(this->root);
+    cout << "Print InOrder Traversal: " << endl;
+    this->inorder(this->root);
+    cout << "Print PostOrder Traversal: " << endl;
+    this->postorder(this->root);
+}
+
+void BinarySearchTree::printTree(int order) {
+  switch (order) {
+    case 0: {
+      cout << "Print PreOrder Traversal: " << endl;
+      this->preorder(this->root);
+      break;
+    }
+    case 1:
+      cout << "Print InOrder Traversal: " << endl;
+      this->inorder(this->root);
+      break;
+    case 2:
+      cout << "Print PostOrder Traversal: " << endl;
+      this->postorder(this->root);
+      break;
+    default:
+      break;
+  }
+}
+
+void BinarySearchTree::preorder(Node * rootnode) {
+  if(rootnode != NULL) {
+    cout << rootnode->key << endl;
+    preorder(rootnode->left);
+    preorder(rootnode->right);
+  }
+}
+
+void BinarySearchTree::inorder(Node * rootnode) {
+  if (rootnode != NULL){
+    inorder(rootnode->left);
+    cout << rootnode->key << endl;
+    inorder(rootnode->right);
+  }
+}
+
+
+
+void BinarySearchTree::postorder(Node * rootnode) {
+  if (rootnode != NULL) {
+    postorder(rootnode->left);
+    postorder(rootnode->right);
+    cout << rootnode->key << endl;
+  }
+}
+
 bool BinarySearchTree::isEmpty() {
   return (size == 0);
 }
@@ -154,22 +224,19 @@ int BinarySearchTree::getSize() {
 }
 
 int main() {
-  BinarySearchTree* bst = new BinarySearchTree(8);
+  BinarySearchTree* bst = new BinarySearchTree(50);
+  bst->insert(30);
+  bst->insert(20);
+  bst->insert(40);
+  bst->insert(70);
+  bst->insert(60);
+  bst->insert(80);
 
-  bst->insert(3);
-  bst->insert(4);
-  bst->insert(7);
-  bst->insert(5);
-  bst->insert(10);
-  bst->insert(2);
-  bst->insert(9);
-  bst->insert(11);
-
-cout << "Size : " << bst->getSize() << endl;
- bst->search(7);
- bst->search(2);
- bst->search(1);
+//Inorder traversal should print (20,30,40,50,60,70,80)
+//preorder 0, inorder 1, postorder 2
+  bst->printTree();
 
   delete bst;
+
   return 0;
 }
