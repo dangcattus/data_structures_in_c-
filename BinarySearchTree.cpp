@@ -9,7 +9,7 @@
 #include <iostream>
 #include <stddef.h>
 
-#define DEBUG 1
+#define DEBUG 0
 
 using namespace std;
 
@@ -43,6 +43,8 @@ public:
 
   ~BinarySearchTree() {}
 
+  Node* minimumKey(Node * subtree);
+
   void insert(int i);
   void insertArray();
   void insert (Node* node, Node* subtree);
@@ -50,7 +52,8 @@ public:
   int search(int key);
   Node* search (int val, Node* subtree);
 
-  int remove(int i);
+  void removeNode(int i);
+  void removeNode(int i, Node * node);
 
   void inorder(Node * node);
   void postorder(Node * node);
@@ -63,6 +66,18 @@ public:
   int getSize();
 };
 
+BinarySearchTree::Node * BinarySearchTree::minimumKey(Node* subtree) {
+  Node* curr = subtree;
+  while (curr->left != nullptr) {
+    curr = curr->left;
+  }
+  if (DEBUG){
+    if (curr != nullptr){
+      cout << "minimumKey is " << curr->key << endl;
+    }
+  }
+  return curr;
+}
 
 void BinarySearchTree::insert(Node* node, Node* subtree) {
     if(node->key < subtree->key) {
@@ -151,12 +166,72 @@ BinarySearchTree::Node* BinarySearchTree::search(int val, Node* subtree) {
   }
 }
 
-int BinarySearchTree::remove(int val) {
+void BinarySearchTree::removeNode(int val) {
   //return the node
-  return 0;
-// 1. node to be deleted is leaf
-// 2. node to be deleted has 1 child
-// 3. node to be deleted has 2 children
+  if (DEBUG)
+    cout << "Removing " << val << endl;
+  Node* node;
+  if (!this->isEmpty()) {
+    node = this->search(val, this->root);
+    if (node == nullptr) {
+      cout << "Cannot find " << val << "in tree" << endl;
+      return;
+    }
+    this->removeNode(val, node);
+  }
+  else {
+    cout << "Binary Search Tree is empty" << endl;
+  }
+  return;
+}
+
+
+void BinarySearchTree::removeNode(int val, Node* node) {
+
+ // 1. node to be deleted is leaf
+   if ((node->left == nullptr) && (node->right == nullptr)) {
+     if (DEBUG)
+       cout <<"Node to be deleted is leaf" << endl;
+     if (node->parent->left == node) {
+       node->parent->left = nullptr;
+     }
+     else {
+       node->parent->right = nullptr;
+     }
+     delete node;
+   }
+   // 3. node to be deleted has 2 children
+   else if ((node->left != nullptr) && (node->right != nullptr)) {
+     if (DEBUG)
+      cout << "Node to be deleted has 2 children" << endl;
+     Node * succ = minimumKey(node->right);
+     int succVal = succ->key;
+     if (DEBUG)
+      cout<< "REMOVE NODE RECURSIVE: succ->key = " << succ->key << ", node->right->key = " << node->right->key << endl;
+     removeNode(succ->key);
+     node->key = succVal;
+   }
+   // 2. node to be deleted has 1 child
+   else if((node->left != nullptr) || (node->right != nullptr)){
+     Node * temp;
+     if (DEBUG)
+      cout << "Node to be deleted has 1 child" << endl;
+     if (node->left != nullptr) {
+       temp = node->left;
+     }
+     else {
+       temp = node->right;
+     }
+     temp->parent = node->parent;
+     delete node;
+   }
+
+ else {
+   cout << "Error: Cannot remove from binary tree" << endl;
+   return;
+ }
+   this->size --;
+   return;
 }
 
 void BinarySearchTree::printTree() {
@@ -205,8 +280,6 @@ void BinarySearchTree::inorder(Node * rootnode) {
   }
 }
 
-
-
 void BinarySearchTree::postorder(Node * rootnode) {
   if (rootnode != NULL) {
     postorder(rootnode->left);
@@ -231,11 +304,15 @@ int main() {
   bst->insert(70);
   bst->insert(60);
   bst->insert(80);
-
+   /*for (int i = 15; i <=85; i +=10 ) {
+     bst->insert(i);
+   }*/
 //Inorder traversal should print (20,30,40,50,60,70,80)
 //preorder 0, inorder 1, postorder 2
-  bst->printTree();
 
+  bst->printTree(1);
+  bst->removeNode(50);
+  bst->printTree(1);
   delete bst;
 
   return 0;
